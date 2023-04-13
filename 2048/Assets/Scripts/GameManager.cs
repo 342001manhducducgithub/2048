@@ -5,14 +5,31 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
     public TileBoard board;
     public CanvasGroup gameOver;
+    public CanvasGroup youWin;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI hiscoreText;
     private int score;
+    public bool isContinue;
     private void Start()
     {
         NewGame();
+    }
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(this.gameObject);
     }
     public void NewGame()
     {
@@ -24,18 +41,51 @@ public class GameManager : MonoBehaviour
         gameOver.alpha = 0f;
         gameOver.interactable = false;
 
+        // giau man hinh you win
+        youWin.alpha = 0f;
+        youWin.interactable = false;
+
         // update board state
         board.ClearBoard();
         board.CreateTile();
         board.CreateTile();
         board.enabled = true;
+
+        SoundManager.Instance.OffMusicWin();
+        SoundManager.Instance.OffMusicLose();
+        SoundManager.Instance.OnBackGroundMusic();
     }
     public void GameOver()
     {
         board.enabled = false;
         gameOver.interactable = true;
 
+        SoundManager.Instance.OnMusicLose();
+        SoundManager.Instance.OffBackGroundMusic();
+
         StartCoroutine(Fade(gameOver, 1f, 1f));
+    }
+    public void YouWin()
+    {
+        board.enabled = false;
+        youWin.interactable = true;
+
+        SoundManager.Instance.OnMusicWin();
+        SoundManager.Instance.OffBackGroundMusic();
+
+        StartCoroutine(Fade(youWin, 1f, 1f));
+    }
+    public void CountinueGame()
+    {
+        board.enabled = true;
+        youWin.alpha = 0f;
+        youWin.interactable = false;
+
+        SoundManager.Instance.OffMusicWin();
+        //SoundManager.Instance.OffMusicLose();
+        SoundManager.Instance.OnBackGroundMusic();
+
+        isContinue = true;
     }
     private IEnumerator Fade(CanvasGroup canvasGroup, float to, float delay = 0f)
     {
