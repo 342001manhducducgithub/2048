@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public TileBoard board;
     public CanvasGroup gameOver;
     public CanvasGroup youWin;
+    public CanvasGroup congrats;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI hiscoreText;
     private int score;
@@ -45,6 +46,10 @@ public class GameManager : MonoBehaviour
         youWin.alpha = 0f;
         youWin.interactable = false;
 
+        // giau man hinh congrats
+        congrats.alpha = 0f;
+        congrats.interactable = false;
+
         // update board state
         board.ClearBoard();
         board.CreateTile();
@@ -74,6 +79,16 @@ public class GameManager : MonoBehaviour
         SoundManager.Instance.OffBackGroundMusic();
 
         StartCoroutine(Fade(youWin, 1f, 1f));
+    }
+    public void Congrats()
+    {
+        board.enabled = false;
+        congrats.interactable = true;
+
+        //SoundManager.Instance.OnMusicWin();
+        //SoundManager.Instance.OffBackGroundMusic();
+
+        StartCoroutine(Fade(congrats, 1f, 1f));
     }
     public void CountinueGame()
     {
