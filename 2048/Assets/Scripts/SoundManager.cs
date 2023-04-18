@@ -7,6 +7,7 @@ public class SoundManager : MonoBehaviour
     public AudioSource backgroundMusic;
     public AudioSource musicWin;
     public AudioSource musicLose;
+    public AudioSource musicCongrats;
     public static SoundManager Instance = null;
     private void Awake()
     {
@@ -47,6 +48,14 @@ public class SoundManager : MonoBehaviour
     public void OffMusicLose()
     {
         musicLose.Stop();
+    }
+    public void OnMusicCongrats()
+    {
+        musicCongrats.Play();
+    }
+    public void OffMusicCongrats()
+    {
+        musicCongrats.Stop();
     }
 
 }

@@ -59,6 +59,7 @@ public class GameManager : MonoBehaviour
         SoundManager.Instance.OffMusicWin();
         SoundManager.Instance.OffMusicLose();
         SoundManager.Instance.OnBackGroundMusic();
+        SoundManager.Instance.OffMusicCongrats();
     }
     public void GameOver()
     {
@@ -85,8 +86,8 @@ public class GameManager : MonoBehaviour
         board.enabled = false;
         congrats.interactable = true;
 
-        //SoundManager.Instance.OnMusicWin();
-        //SoundManager.Instance.OffBackGroundMusic();
+        SoundManager.Instance.OnMusicCongrats();
+        SoundManager.Instance.OffBackGroundMusic();
 
         StartCoroutine(Fade(congrats, 1f, 1f));
     }

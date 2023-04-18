@@ -14,7 +14,7 @@ public class TileBoard : MonoBehaviour
     private void Awake()
     {
         grid = GetComponentInChildren<TileGrid>();
-        tiles = new List<Tile>(16);
+        tiles = new List<Tile>(12);
     }
     //private void Start()
     //{
@@ -39,7 +39,7 @@ public class TileBoard : MonoBehaviour
     {
         Tile tile = Instantiate(tilePrefab, grid.transform);
         // 2, 4, 8, 16,...
-        tile.SetState(tileStates[0], 1024);
+        tile.SetState(tileStates[0], 4096);
         tile.Spawn(grid.GetRandomEmptyCell());
         tiles.Add(tile);
     }
@@ -168,11 +168,18 @@ public class TileBoard : MonoBehaviour
         if (tiles.Count != grid.size)
         {
             CreateTile();
-        }
+        }      
 
-        if (CheckForGameOver())
+        if (CheckForWinGame())
         {
-            gameManager.GameOver();
+            GameManager.Instance.Congrats();
+        }
+        else
+        {
+            if (CheckForGameOver())
+            {
+                gameManager.GameOver();
+            }
         }
     }
     public bool CheckForGameOver()
@@ -205,6 +212,24 @@ public class TileBoard : MonoBehaviour
             }
 
             if (right != null && CanMerge(tile, right.tile))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public bool CheckForWinGame()
+    {
+        if (tiles.Count != grid.size)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            if (tiles[i].number < 4096)
             {
                 return false;
             }
