@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class TileBoard : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class TileBoard : MonoBehaviour
     {
         Tile tile = Instantiate(tilePrefab, grid.transform);
         // 2, 4, 8, 16,...
-        tile.SetState(tileStates[0], 4096);
+        tile.SetState(tileStates[0], 512);
         tile.Spawn(grid.GetRandomEmptyCell());
         tiles.Add(tile);
     }
@@ -236,5 +237,17 @@ public class TileBoard : MonoBehaviour
         }
 
         return true;
+    }
+    public void CreateTile(int number, TileCell tileCell) //
+    {
+        Tile tile = Instantiate(tilePrefab, grid.transform);
+        tile.SetState(tileStates[(int)Math.Log(number, 2) - 1], number);
+        tile.Spawn(tileCell);
+        tiles.Add(tile);
+
+    }
+    public TileGrid getGrid() //
+    {
+        return this.grid;
     }
 }

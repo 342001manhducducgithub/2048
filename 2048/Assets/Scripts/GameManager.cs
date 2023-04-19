@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.IO;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public TileBoard board;
+    public TileCell[] cells; //
     public CanvasGroup gameOver;
     public CanvasGroup youWin;
     public CanvasGroup congrats;
@@ -131,7 +133,6 @@ public class GameManager : MonoBehaviour
 
         SaveHiscore();
     }
-
     private void SaveHiscore()
     {
         int hiscore = LoadHiscore();
@@ -145,5 +146,68 @@ public class GameManager : MonoBehaviour
     private int LoadHiscore()
     {
         return PlayerPrefs.GetInt("hiscore", 0);
+    }
+    public void SaveGame() //
+    {
+        if (board.enabled)
+        {
+            TileGrid grid = board.getGrid();
+            TileCell[] cells = grid.cells;
+            string saveString = "";
+            foreach (TileCell cell in cells)
+            {
+                if (!cell.empty)
+                    saveString += cell.tile.number.ToString() + "," + cell.coordinates.x.ToString() + "," + cell.coordinates.y.ToString() + ",";
+            }
+            saveString += "," + score.ToString();
+            File.WriteAllText(Application.dataPath + "/data.save", saveString);
+        }
+    }
+    public bool LoadGame() //
+    {
+        if (File.Exists(Application.dataPath + "/data.save")) // /data.save
+        {
+            board.ClearBoard();
+            string saveString = File.ReadAllText(Application.dataPath + "/data.save");
+
+            string[] saveSplit = saveString.Split(',');
+
+            int number = 0;
+            int posx = 0;
+            int posy = 0;
+            TileGrid grid = board.getGrid();
+
+            TileCell[] cells = grid.cells;            
+
+            for (int i = 0; i < saveSplit.Length; i++)
+            {
+                if (saveSplit[i].Length != 0)
+                {
+                    if (i % 3 == 0)
+                    {
+                        number = int.Parse(saveSplit[i]);
+                    }
+                    else if (i % 3 == 1)
+                    {
+                        posx = int.Parse(saveSplit[i]);
+                    }
+                    else if (i % 3 == 2)
+                    {
+                        posy = int.Parse(saveSplit[i]);
+                        board.CreateTile(number, grid.GetCell(posx, posy));
+                    }
+                }
+                else
+                {
+                    SetScore(int.Parse(saveSplit[i + 1]));
+                }
+            }
+            return true;
+        }
+        else return false;
+    }
+    public void LoadGame2048() 
+    {
+        LoadGame();
     }
 }
