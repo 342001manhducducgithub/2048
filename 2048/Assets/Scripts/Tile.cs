@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class Tile : MonoBehaviour
 {
+    public static GameManager winNumber; //
     public TileState state { get; private set; }
     public TileCell cell { get; private set; }
     public int number { get; private set; }
@@ -83,5 +85,12 @@ public class Tile : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+    public void Initialize(int number, TileCell cell) //
+    {
+        this.number = number;
+        this.cell = cell;
+        transform.position = cell.transform.position;
+        gameObject.SetActive(true);
     }
 }
