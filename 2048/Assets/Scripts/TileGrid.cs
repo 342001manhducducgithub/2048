@@ -1,9 +1,13 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TileGrid : MonoBehaviour
 {
+    //public Tile[] tiles { get; set; } //
+    public Tile tiles; //
+    public Tile tilePrefab; //
     public TileRow[] rows { get; private set; }
     public TileCell[] cells { get; private set; }
     public int size => cells.Length;
@@ -69,5 +73,41 @@ public class TileGrid : MonoBehaviour
         }
 
         return cells[index];
+    }
+    public void SpawnTileAt(int tileNumber, int row, int column) //
+    {
+        if (rows[row].cells[column].tile != null)
+        {
+            // Nếu ô đã có tile rồi thì không làm gì cả
+            return;
+        }
+
+        // Tạo một tile mới với giá trị xác định
+        Tile newTile = Instantiate(tilePrefab, rows[row].cells[column].transform.position, Quaternion.identity);
+        newTile.Initialize(tileNumber, rows[row].cells[column]);
+        rows[row].cells[column].tile = newTile;
+
+        // Thêm tile mới vào danh sách các tile
+        tiles.Add(newTile);
+    }
+    public void RemoveTileAt(int row, int column) //
+    {
+        if (rows[row].cells[column].tile == null)
+        {
+            // Nếu ô không có tile thì không làm gì cả
+            return;
+        }
+
+        // Lưu trữ tile hiện có
+        Tile currentTile = rows[row].cells[column].tile;
+
+        // Xóa tile khỏi danh sách các tile
+        tiles.Remove(currentTile);
+
+        // Xóa tile khỏi ô
+        rows[row].cells[column].tile = null;
+
+        // Hủy game object của tile
+        Destroy(currentTile.gameObject);
     }
 }

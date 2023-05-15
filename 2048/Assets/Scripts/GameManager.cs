@@ -1,14 +1,14 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.IO;
+using System;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public TileBoard board;
-    public TileCell[] cells; //
     public CanvasGroup gameOver;
     public CanvasGroup youWin;
     public CanvasGroup congrats;
@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI hiscoreText;
     private int score;
     public bool isContinue;
+    private int[,] boards = new int[4, 4]; //
     private void Start()
     {
         NewGame();
@@ -142,7 +143,6 @@ public class GameManager : MonoBehaviour
             PlayerPrefs.SetInt("hiscore", score);
         }
     }
-
     private int LoadHiscore()
     {
         return PlayerPrefs.GetInt("hiscore", 0);
@@ -151,63 +151,46 @@ public class GameManager : MonoBehaviour
     {
         if (board.enabled)
         {
-            TileGrid grid = board.getGrid();
-            TileCell[] cells = grid.cells;
-            string saveString = "";
-            foreach (TileCell cell in cells)
+            string saveTiles = "";
+            for (int i = 0; i < 4; i++)
             {
-                if (!cell.empty)
-                    saveString += cell.tile.number.ToString() + "," + cell.coordinates.x.ToString() + "," + cell.coordinates.y.ToString() + ",";
+                for (int j = 0; j < 4; j++)
+                {
+                    int tileNumber = board.grid.rows[i].cells[j].tile != null ? board.grid.rows[i].cells[j].tile.number : 0;
+                    saveTiles += tileNumber.ToString() + ",";
+                }
             }
-            saveString += "," + score.ToString();
-            File.WriteAllText(Application.dataPath + "/data.save", saveString);
+            PlayerPrefs.SetString("Tile", saveTiles);
         }
     }
-    public bool LoadGame() //
+    public void LoadGame() //
     {
-        if (File.Exists(Application.dataPath + "/data.save")) // /data.save
+        if (board.enabled)
         {
-            board.ClearBoard();
-            string saveString = File.ReadAllText(Application.dataPath + "/data.save");
+            string savedTiles = PlayerPrefs.GetString("Tile");
 
-            string[] saveSplit = saveString.Split(',');
-
-            int number = 0;
-            int posx = 0;
-            int posy = 0;
-            TileGrid grid = board.getGrid();
-
-            TileCell[] cells = grid.cells;            
-
-            for (int i = 0; i < saveSplit.Length; i++)
+            if (!string.IsNullOrEmpty(savedTiles))
             {
-                if (saveSplit[i].Length != 0)
+                string[] tileValues = savedTiles.Split(',');
+
+                for (int i = 0; i < board.grid.rows.Length; i++)
                 {
-                    if (i % 3 == 0)
+                    for (int j = 0; j < board.grid.rows[i].cells.Length; j++)
                     {
-                        number = int.Parse(saveSplit[i]);
+                        int tileNumber = int.Parse(tileValues[i * board.grid.rows.Length + j]);
+
+                        if (tileNumber != 0)
+                        {
+                            board.grid.SpawnTileAt(tileNumber, i, j);
+                        }
+                        else
+                        {
+                            board.grid.RemoveTileAt(i, j);
+                        }
                     }
-                    else if (i % 3 == 1)
-                    {
-                        posx = int.Parse(saveSplit[i]);
-                    }
-                    else if (i % 3 == 2)
-                    {
-                        posy = int.Parse(saveSplit[i]);
-                        board.CreateTile(number, grid.GetCell(posx, posy));
-                    }
-                }
-                else
-                {
-                    SetScore(int.Parse(saveSplit[i + 1]));
                 }
             }
-            return true;
         }
-        else return false;
     }
-    public void LoadGame2048() 
-    {
-        LoadGame();
-    }
+
 }
